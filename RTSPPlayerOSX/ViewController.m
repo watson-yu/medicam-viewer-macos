@@ -24,8 +24,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    //NSString *rtspUrl = @"rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
+    NSString *rtspUrl = @"rtsp://192.168.1.1/h264?w=1280&h=720&fps=30";
     self.lastFrameTime = -1;
-    self.video = [[RTSPPlayer alloc] initWithVideo:@"rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov" usesTcp:YES];
+    self.video = [[RTSPPlayer alloc] initWithVideo:rtspUrl usesTcp:NO];
     self.video.outputWidth=1280;
     self.video.outputHeight = 720;
     [self.video seekTime:0.0];
