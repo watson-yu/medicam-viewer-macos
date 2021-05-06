@@ -182,6 +182,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -320,14 +321,14 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = /usr/local/Cellar/ffmpeg/2.8.5/lib;
-				HEADER_SEARCH_PATHS = /usr/local/Cellar/ffmpeg/2.8.5/include;
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/ffmpeg/4.4_1/lib";
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/ffmpeg/4.4_1/include";
 				INFOPLIST_FILE = RTSPPlayerOSX/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/RTSPPlayerOSX",
-					/usr/local/Cellar/ffmpeg/2.8.5/lib,
+					"$(PROJECT_DIR)/ffmpeg/4.4_1/lib",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.omarzl.RTSPPlayerOSX;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -340,14 +341,14 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = /usr/local/Cellar/ffmpeg/2.8.5/lib;
-				HEADER_SEARCH_PATHS = /usr/local/Cellar/ffmpeg/2.8.5/include;
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/ffmpeg/4.4_1/lib";
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/ffmpeg/4.4_1/include";
 				INFOPLIST_FILE = RTSPPlayerOSX/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/RTSPPlayerOSX",
-					/usr/local/Cellar/ffmpeg/2.8.5/lib,
+					"$(PROJECT_DIR)/ffmpeg/4.4_1/lib",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.omarzl.RTSPPlayerOSX;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -373,6 +374,7 @@
 				806B28B91C5FE4380089BBB2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
