@@ -8,6 +8,9 @@
 
 #import "AppDelegate.h"
 
+NSString *const KEY_CAMERA_IP = @"cameraIpAddress";
+NSString *const KEY_RTMP_URL = @"rtmpPushUrl";
+
 @interface AppDelegate ()
 
 @end
@@ -22,4 +25,14 @@
     // Insert code here to tear down your application
 }
 
+- (void)restartApp {
+    NSURL *url = [NSURL fileURLWithPath:NSBundle.mainBundle.resourcePath];
+    NSString *path = [[[url URLByDeletingLastPathComponent] URLByDeletingLastPathComponent] absoluteString];
+    
+    NSTask *task = [[NSTask alloc] init];
+    task.launchPath = @"/usr/bin/open";
+    task.arguments = @[path];
+    [task launch];
+    exit(0);
+}
 @end

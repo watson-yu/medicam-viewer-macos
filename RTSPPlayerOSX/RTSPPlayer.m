@@ -1,6 +1,7 @@
 #import "RTSPPlayer.h"
 #import "Utilities.h"
 #import "AudioStreamer.h"
+#import "AppDelegate.h"
 
 #ifndef AVCODEC_MAX_AUDIO_FRAME_SIZE
 # define AVCODEC_MAX_AUDIO_FRAME_SIZE 192000 // 1 second of 48khz 32bit audio
@@ -296,9 +297,11 @@ initError:
     int ret = 0;
 
     if (!(ofmt_ctx && stream_mapping_live)) {
-        NSString *nsUrl = @"rtmp://live.fasmedo.com/app/shuttle";
-        //NSString *nsUrl = @"rtmp://23841437.fme.ustream.tv/ustreamVideo/23841437/MY37x2pST4cLTQUhtB46bhHKwJjBv5zw";
-        const char *url = [nsUrl cStringUsingEncoding:NSASCIIStringEncoding];
+        
+        NSUserDefaults *prefs = NSUserDefaults.standardUserDefaults;
+        NSString *rtmpPushUrl = [prefs objectForKey:KEY_RTMP_URL];
+
+        const char *url = [rtmpPushUrl cStringUsingEncoding:NSASCIIStringEncoding];
 
         ret = avformat_alloc_output_context2(&ofmt_ctx, NULL, "flv", url);
         if (ret < 0) {

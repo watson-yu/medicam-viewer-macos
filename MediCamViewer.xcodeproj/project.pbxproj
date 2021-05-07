@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4594E985264525CC0088E197 /* ConnSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4594E984264525CC0088E197 /* ConnSettingsViewController.m */; };
 		806B28A81C5FE4380089BBB2 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 806B28A71C5FE4380089BBB2 /* AppDelegate.m */; };
 		806B28AB1C5FE4380089BBB2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 806B28AA1C5FE4380089BBB2 /* main.m */; };
 		806B28AE1C5FE4380089BBB2 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 806B28AD1C5FE4380089BBB2 /* ViewController.m */; };
@@ -27,7 +28,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		806B28A31C5FE4380089BBB2 /* RTSPPlayerOSX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RTSPPlayerOSX.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4594E984264525CC0088E197 /* ConnSettingsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConnSettingsViewController.m; sourceTree = "<group>"; };
+		4594E987264525E70088E197 /* ConnSettingsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConnSettingsViewController.h; sourceTree = "<group>"; };
+		806B28A31C5FE4380089BBB2 /* MediCamViewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MediCamViewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		806B28A61C5FE4380089BBB2 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		806B28A71C5FE4380089BBB2 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		806B28AA1C5FE4380089BBB2 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -84,7 +87,7 @@
 		806B28A41C5FE4380089BBB2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				806B28A31C5FE4380089BBB2 /* RTSPPlayerOSX.app */,
+				806B28A31C5FE4380089BBB2 /* MediCamViewer.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -102,6 +105,8 @@
 				806B28B11C5FE4380089BBB2 /* Main.storyboard */,
 				806B28B41C5FE4380089BBB2 /* Info.plist */,
 				806B28A91C5FE4380089BBB2 /* Supporting Files */,
+				4594E987264525E70088E197 /* ConnSettingsViewController.h */,
+				4594E984264525CC0088E197 /* ConnSettingsViewController.m */,
 			);
 			path = RTSPPlayerOSX;
 			sourceTree = "<group>";
@@ -146,9 +151,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		806B28A21C5FE4380089BBB2 /* RTSPPlayerOSX */ = {
+		806B28A21C5FE4380089BBB2 /* MediCamViewer */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 806B28B71C5FE4380089BBB2 /* Build configuration list for PBXNativeTarget "RTSPPlayerOSX" */;
+			buildConfigurationList = 806B28B71C5FE4380089BBB2 /* Build configuration list for PBXNativeTarget "MediCamViewer" */;
 			buildPhases = (
 				806B289F1C5FE4380089BBB2 /* Sources */,
 				806B28A01C5FE4380089BBB2 /* Frameworks */,
@@ -158,9 +163,9 @@
 			);
 			dependencies = (
 			);
-			name = RTSPPlayerOSX;
+			name = MediCamViewer;
 			productName = RTSPPlayerOSX;
-			productReference = 806B28A31C5FE4380089BBB2 /* RTSPPlayerOSX.app */;
+			productReference = 806B28A31C5FE4380089BBB2 /* MediCamViewer.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -177,7 +182,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 806B289E1C5FE4380089BBB2 /* Build configuration list for PBXProject "RTSPPlayerOSX" */;
+			buildConfigurationList = 806B289E1C5FE4380089BBB2 /* Build configuration list for PBXProject "MediCamViewer" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -191,7 +196,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				806B28A21C5FE4380089BBB2 /* RTSPPlayerOSX */,
+				806B28A21C5FE4380089BBB2 /* MediCamViewer */,
 			);
 		};
 /* End PBXProject section */
@@ -215,6 +220,7 @@
 			files = (
 				806B28D61C5FE7A40089BBB2 /* Utilities.m in Sources */,
 				806B28AE1C5FE4380089BBB2 /* ViewController.m in Sources */,
+				4594E985264525CC0088E197 /* ConnSettingsViewController.m in Sources */,
 				806B28D51C5FE7A40089BBB2 /* RTSPPlayer.m in Sources */,
 				806B28AB1C5FE4380089BBB2 /* main.m in Sources */,
 				806B28A81C5FE4380089BBB2 /* AppDelegate.m in Sources */,
@@ -358,7 +364,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		806B289E1C5FE4380089BBB2 /* Build configuration list for PBXProject "RTSPPlayerOSX" */ = {
+		806B289E1C5FE4380089BBB2 /* Build configuration list for PBXProject "MediCamViewer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				806B28B51C5FE4380089BBB2 /* Debug */,
@@ -367,7 +373,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		806B28B71C5FE4380089BBB2 /* Build configuration list for PBXNativeTarget "RTSPPlayerOSX" */ = {
+		806B28B71C5FE4380089BBB2 /* Build configuration list for PBXNativeTarget "MediCamViewer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				806B28B81C5FE4380089BBB2 /* Debug */,

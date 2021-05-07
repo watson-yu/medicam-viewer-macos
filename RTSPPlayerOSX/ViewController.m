@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "RTSPPlayer.h"
+#import "AppDelegate.h"
 
 #define LERP(A,B,C) ((A)*(1.0-C)+(B)*C)
 
@@ -23,17 +24,8 @@
 
 @implementation ViewController
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
-    //NSString *rtspUrl = @"rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
-    NSString *rtspUrl = @"rtsp://192.168.1.1/h264?w=1280&h=720&fps=30";
-    self.lastFrameTime = -1;
-    self.video = [[RTSPPlayer alloc] initWithVideo:rtspUrl usesTcp:NO];
-    self.video.outputWidth=1280;
-    self.video.outputHeight = 720;
-    [self.video seekTime:0.0];
-
+- (void)startTimers
+{
     self.nextFrameTimer = [NSTimer scheduledTimerWithTimeInterval:1.0/30
                                                            target:self
                                                          selector:@selector(displayNextFrame:)
@@ -45,7 +37,55 @@
                                                          selector:@selector(pushFrame:)
                                                          userInfo:nil
                                                           repeats:YES];
+}
 
+- (void)stopTimers
+{
+    [self.nextFrameTimer invalidate];
+    [self.pushFrameTimer invalidate];
+}
+
+- (NSString*)getCameraIpAddress
+{
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    
+    BOOL toSave = NO;
+    
+    NSString *cameraIpAddress = [prefs stringForKey:KEY_CAMERA_IP];
+    if (!cameraIpAddress || [cameraIpAddress length] < 7) {
+        cameraIpAddress = @"192.168.1.1";
+        toSave = YES;
+        [prefs setObject:cameraIpAddress forKey:KEY_CAMERA_IP];
+    }
+    
+    NSString *rtmpPushUrl = [prefs stringForKey:KEY_RTMP_URL];
+    if (!rtmpPushUrl || [rtmpPushUrl length] < 14) {
+        rtmpPushUrl = @"rtpm://live.fasmedo.com/app/shuttle";
+        //@"rtmp://23841437.fme.ustream.tv/ustreamVideo/23841437/MY37x2pST4cLTQUhtB46bhHKwJjBv5zw";
+        toSave = YES;
+        [prefs setObject:rtmpPushUrl forKey:KEY_RTMP_URL];
+    }
+    
+    if (toSave) {
+        [prefs synchronize];
+    }
+    return cameraIpAddress;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    NSString *cameraIpAddress = [self getCameraIpAddress];
+
+    NSString *rtspUrl = [NSString stringWithFormat:@"rtsp://%@/h264?w=1280&h=720&fps=30", cameraIpAddress];
+    
+    self.lastFrameTime = -1;
+    self.video = [[RTSPPlayer alloc] initWithVideo:rtspUrl usesTcp:NO];
+    self.video.outputWidth=1280;
+    self.video.outputHeight = 720;
+    [self.video seekTime:0.0];
+
+    [self startTimers];
 }
 
 -(void)displayNextFrame:(NSTimer *)timer
@@ -73,6 +113,16 @@
 
 - (void)setRepresentedObject:(id)representedObject {
     [super setRepresentedObject:representedObject];
+}
+
+- (IBAction)startPreview:(id)sender
+{
+    [self startTimers];
+}
+
+- (IBAction)stopPreview:(id)sender
+{
+    [self stopTimers];
 }
 
 @end

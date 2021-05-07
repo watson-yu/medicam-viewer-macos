@@ -8,8 +8,12 @@
 
 #import <Cocoa/Cocoa.h>
 
+FOUNDATION_EXPORT NSString *const KEY_CAMERA_IP;
+FOUNDATION_EXPORT NSString *const KEY_RTMP_URL;
+
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
+- (void)restartApp;
 
 @end
 

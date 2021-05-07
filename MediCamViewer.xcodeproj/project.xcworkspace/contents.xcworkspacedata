@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:RTSPPlayerOSX.xcodeproj">
+      location = "self:/Users/wyu/dev/xcode/medicam-viewer-macos/MediCamViewer.xcodeproj">
    </FileRef>
 </Workspace>
