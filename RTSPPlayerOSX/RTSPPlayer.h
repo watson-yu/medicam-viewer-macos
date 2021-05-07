@@ -31,10 +31,12 @@
     BOOL _inBuffer;
     AVPacket *_packet, _currentPacket;
     BOOL primed;
+    
+    AVPacket *savedPacket0;
    
     AVFormatContext *ofmt_ctx;
     AVStream* out_stream;
-    int isProcessing;
+    BOOL isProcessing;
     int *stream_mapping, *stream_mapping_live;
     int64_t pts_start_live_timestamp_0, dts_start_live_timestamp_0;
     int64_t pts_start_live_timestamp_1, dts_start_live_timestamp_1;
@@ -75,5 +77,6 @@
 -(void)closeAudio;
 
 - (AVPacket*)readPacket;
+-(void)pushPacket;
 
 @end

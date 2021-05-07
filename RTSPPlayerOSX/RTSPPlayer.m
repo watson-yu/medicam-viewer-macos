@@ -73,7 +73,7 @@
 
 - (void)init2
 {
-    isProcessing = 0;
+    isProcessing = NO;
     pts_start_live_timestamp_0 = 0;
     dts_start_live_timestamp_0 = 0;
     pts_start_live_timestamp_1 = 0;
@@ -283,9 +283,15 @@ initError:
     return ret;
 }
 
-- (int) pushPacket:(AVPacket*) packet
+- (void) pushPacket
 {
-    isProcessing = 1;
+    if (! isProcessing) {
+        [self pushPacketBackground:savedPacket0];
+    }
+}
+
+- (int) pushPacketBackground:(AVPacket*)packet
+{
     AVStream* out_stream = NULL;
     int ret = 0;
 
@@ -317,8 +323,8 @@ initError:
         //stop_live();
         return -1;
     }
-    AVPacket* stream_pkt = av_packet_clone(packet);
-    stream_pkt->stream_index = stream_mapping_live[packet->stream_index];
+        
+    packet->stream_index = stream_mapping_live[packet->stream_index];
     out_stream = ofmt_ctx->streams[packet->stream_index];
 
     if (packet->stream_index == 1) {
@@ -327,86 +333,80 @@ initError:
             pts_start_live_timestamp_1 = packet->pts;
             dts_start_live_timestamp_1 = packet->dts;
         }
-        stream_pkt->pts -= pts_start_live_timestamp_1;
-        stream_pkt->dts -= dts_start_live_timestamp_1;
-        if (packet->pts == AV_NOPTS_VALUE || stream_pkt->pts < last_mux_pts_1_live || stream_pkt->dts < last_mux_dts_1_live) {
+        packet->pts -= pts_start_live_timestamp_1;
+        packet->dts -= dts_start_live_timestamp_1;
+        if (packet->pts == AV_NOPTS_VALUE || packet->pts < last_mux_pts_1_live || packet->dts < last_mux_dts_1_live) {
             int64_t duration = 0;
-            if (stream_pkt->duration > 0) {
+            if (packet->duration > 0) {
                 // use duration from packet if it provide
-                duration = stream_pkt->duration;
+                duration = packet->duration;
             } else {
                 //, or calculate with frame rate and others
                 duration = in_stream->time_base.den / in_stream->r_frame_rate.num * in_stream->r_frame_rate.den;
             }
             // translate timestamp when window was dragged or resized
-            stream_pkt->pts = last_mux_pts_1_live + duration;
-            stream_pkt->dts = last_mux_dts_1_live + duration;
+            packet->pts = last_mux_pts_1_live + duration;
+            packet->dts = last_mux_dts_1_live + duration;
         }
         // remember timestamp after translation for the next round
-        last_mux_pts_1_live = stream_pkt->pts;
-        last_mux_dts_1_live = stream_pkt->dts;
+        last_mux_pts_1_live = packet->pts;
+        last_mux_dts_1_live = packet->dts;
     } else if (packet->stream_index == 0) {
         if (pts_start_live_timestamp_0 == 0 || dts_start_live_timestamp_0 == 0) {
             // timestamp at recording starting
             pts_start_live_timestamp_0 = packet->pts;
             dts_start_live_timestamp_0 = packet->dts;
         }
-        stream_pkt->pts -= pts_start_live_timestamp_0;
-        stream_pkt->dts -= dts_start_live_timestamp_0;
-        if (packet->pts == AV_NOPTS_VALUE || stream_pkt->pts < last_mux_pts_0_live || stream_pkt->dts < last_mux_dts_0_live) {
+        packet->pts -= pts_start_live_timestamp_0;
+        packet->dts -= dts_start_live_timestamp_0;
+        if (packet->pts == AV_NOPTS_VALUE || packet->pts < last_mux_pts_0_live || packet->dts < last_mux_dts_0_live) {
             int64_t duration = 0;
-            if (stream_pkt->duration > 0) {
+            if (packet->duration > 0) {
                 // use duration from packet if it provide
-                duration = stream_pkt->duration;
+                duration = packet->duration;
             } else {
                 //, or calculate with frame rate and others
+                if (in_stream->r_frame_rate.num > 0 && in_stream->r_frame_rate.den > 0)
                 duration = in_stream->time_base.den / in_stream->r_frame_rate.num * in_stream->r_frame_rate.den;
             }
             // translate timestamp when window was dragged or resized
-            stream_pkt->pts = last_mux_pts_0_live + duration;
-            stream_pkt->dts = last_mux_dts_0_live + duration;
+            packet->pts = last_mux_pts_0_live + duration;
+            packet->dts = last_mux_dts_0_live + duration;
         }
         // remember timestamp after translation for the next round
-        last_mux_pts_0_live = stream_pkt->pts;
-        last_mux_dts_0_live = stream_pkt->dts;
+        last_mux_pts_0_live = packet->pts;
+        last_mux_dts_0_live = packet->dts;
     }
 
-    stream_pkt->pts = av_rescale_q_rnd(stream_pkt->pts, in_stream->time_base, out_stream->time_base, (enum AVRounding)(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
-    stream_pkt->dts = av_rescale_q_rnd(stream_pkt->dts, in_stream->time_base, out_stream->time_base, (enum AVRounding)(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
-    stream_pkt->duration = av_rescale_q(stream_pkt->duration, in_stream->time_base, out_stream->time_base);
-    stream_pkt->pos = -1;
+    packet->pts = av_rescale_q_rnd(packet->pts, in_stream->time_base, out_stream->time_base, (enum AVRounding)(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
+    packet->dts = av_rescale_q_rnd(packet->dts, in_stream->time_base, out_stream->time_base, (enum AVRounding)(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
+    packet->duration = av_rescale_q(packet->duration, in_stream->time_base, out_stream->time_base);
+    packet->pos = -1;
 
-    if ((stream_pkt->pts >= 0 && stream_pkt->dts >= 0)) {
+    if ((packet->pts >= 0 && packet->dts >= 0)) {
         // write packet into file
-        ret = av_interleaved_write_frame(ofmt_ctx, stream_pkt);
+        ret = av_interleaved_write_frame(ofmt_ctx, packet);
         if (ret < 0) {
-            //send_server_retry++;
             char a[64];
             char* err = av_make_error_string(a, 64, ret);
             NSLog(@"Error muxing packet: %s\r\n", err);
-            /*if (send_server_retry > 99) {
-                stop_live();
-                //return;
-            }*/
-        }
-        else {
-            //send_server_retry = 0;
         }
     }
-
-    if (stream_pkt) {
-        av_packet_unref(stream_pkt);
-        av_packet_free(&stream_pkt);
-    }
-    /*
     if (packet) {
         av_packet_unref(packet);
         av_packet_free(&packet);
     }
-     */
-    isProcessing = 0;
 
     return ret;
+}
+
+- (void)savePacketData:(AVPacket*)packet
+{
+    isProcessing = YES;
+    AVPacket *newPacket = av_packet_alloc();
+    av_packet_ref(newPacket, packet);
+    savedPacket0 = newPacket;
+    isProcessing = NO;
 }
 
 - (BOOL)stepFrame
@@ -415,7 +415,7 @@ initError:
     int frameFinished=0;
 
     while (!frameFinished && av_read_frame(pFormatCtx, &packet) >=0 ) {
-        [self pushPacket:&packet];
+        [self savePacketData:&packet];
         
         // Is this a packet from the video stream?
         if(packet.stream_index==videoStream) {

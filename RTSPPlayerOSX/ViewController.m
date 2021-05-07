@@ -16,6 +16,7 @@
 @property (nonatomic, retain) IBOutlet NSImageView *imageView;
 @property (nonatomic, retain) RTSPPlayer *video;
 @property (nonatomic, retain) NSTimer *nextFrameTimer;
+@property (nonatomic, retain) NSTimer *pushFrameTimer;
 @property (nonatomic) float lastFrameTime;
 
 @end
@@ -32,11 +33,19 @@
     self.video.outputWidth=1280;
     self.video.outputHeight = 720;
     [self.video seekTime:0.0];
+
     self.nextFrameTimer = [NSTimer scheduledTimerWithTimeInterval:1.0/30
                                                            target:self
                                                          selector:@selector(displayNextFrame:)
                                                          userInfo:nil
                                                           repeats:YES];
+
+    self.pushFrameTimer = [NSTimer scheduledTimerWithTimeInterval:1.0/30
+                                                           target:self
+                                                         selector:@selector(pushFrame:)
+                                                         userInfo:nil
+                                                          repeats:YES];
+
 }
 
 -(void)displayNextFrame:(NSTimer *)timer
@@ -48,6 +57,7 @@
         return;
     }
     self.imageView.image = self.video.currentImage;
+
     float frameTime = 1.0/([NSDate timeIntervalSinceReferenceDate]-startTime);
     if (self.lastFrameTime<0) {
         self.lastFrameTime = frameTime;
@@ -56,6 +66,10 @@
     }
 }
 
+-(void)pushFrame:(NSTimer *)timer
+{
+    [self.video pushPacket];
+}
 
 - (void)setRepresentedObject:(id)representedObject {
     [super setRepresentedObject:representedObject];
