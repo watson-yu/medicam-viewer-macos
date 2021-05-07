@@ -15,6 +15,7 @@
 -(NSImage *)imageFromAVPicture:(AVPicture)pict width:(int)width height:(int)height;
 -(void)savePicture:(AVPicture)pFrame width:(int)width height:(int)height index:(int)iFrame;
 -(void)setupScaler;
+
 @end
 
 @implementation RTSPPlayer
@@ -68,6 +69,19 @@
 - (int)sourceHeight
 {
 	return pCodecCtx->height;
+}
+
+- (void)init2
+{
+    isProcessing = 0;
+    pts_start_live_timestamp_0 = 0;
+    dts_start_live_timestamp_0 = 0;
+    pts_start_live_timestamp_1 = 0;
+    dts_start_live_timestamp_1 = 0;
+    last_mux_dts_0_live = 0;
+    last_mux_pts_0_live = 0;
+    last_mux_dts_1_live = 0;
+    last_mux_pts_1_live = 0;
 }
 
 - (id)initWithVideo:(NSString *)moviePath usesTcp:(BOOL)usesTcp
@@ -144,6 +158,7 @@
 			
 	outputWidth = pCodecCtx->width;
 	self.outputHeight = pCodecCtx->height;
+    [self init2];
 			
 	return self;
 	
@@ -210,12 +225,198 @@ initError:
     
 }
 
+-(int) initialize_outputfile:(AVFormatContext*)oc :(AVStream*) out_stream :(AVFormatContext*) ifmt_ctx :(const char*) dir :(int) flag
+{
+    // allocate memory block for saving context of output file
+    int stream_mapping_size = pFormatCtx->nb_streams;
+    int stream_index = 0;
+    if (flag == 0)
+        stream_mapping = (int*)av_mallocz_array(stream_mapping_size, sizeof(*stream_mapping));
+    else
+        stream_mapping_live = (int*)av_mallocz_array(stream_mapping_size, sizeof(*stream_mapping));
+
+
+    // copy stream infomation from input to output
+    for (int i = 0; i < ifmt_ctx->nb_streams; i++)
+    {
+        if (ifmt_ctx->streams[i]->codecpar->codec_type != AVMEDIA_TYPE_AUDIO &&
+            ifmt_ctx->streams[i]->codecpar->codec_type != AVMEDIA_TYPE_VIDEO &&
+            ifmt_ctx->streams[i]->codecpar->codec_type != AVMEDIA_TYPE_SUBTITLE) {
+            if (flag == 0)
+                stream_mapping[i] = -1;
+            else
+                stream_mapping_live[i] = -1;
+            continue;
+        }
+
+        // Add new stream into output context
+        if (flag == 0)
+            stream_mapping[i] = stream_index++;
+        else
+            stream_mapping_live[i] = stream_index++;
+        out_stream = avformat_new_stream(oc, NULL);
+        avcodec_parameters_copy(out_stream->codecpar, ifmt_ctx->streams[i]->codecpar);
+        out_stream->codecpar->codec_tag = 0;
+    }
+
+    // print input and output format info on the console
+    av_dump_format(oc, 0, dir, 1);
+    int ret = 0;
+    // open file and initialize I/O context for output file
+    ret = avio_open(&oc->pb, dir, AVIO_FLAG_WRITE);
+    if (ret < 0) {
+        return -1;
+    }
+
+    // write header in output file
+    if (oc->pb)
+    {
+        ret = avformat_write_header(oc, NULL);
+        if (ret < 0) {
+            NSLog(@"write private data failed, return %d\r\n", ret);
+        }
+    }
+    else {
+        return -1;
+    }
+
+    return ret;
+}
+
+- (int) pushPacket:(AVPacket*) packet
+{
+    isProcessing = 1;
+    AVStream* out_stream = NULL;
+    int ret = 0;
+
+    if (!(ofmt_ctx && stream_mapping_live)) {
+        NSString *nsUrl = @"rtmp://live.fasmedo.com/app/shuttle";
+        //NSString *nsUrl = @"rtmp://23841437.fme.ustream.tv/ustreamVideo/23841437/MY37x2pST4cLTQUhtB46bhHKwJjBv5zw";
+        const char *url = [nsUrl cStringUsingEncoding:NSASCIIStringEncoding];
+
+        ret = avformat_alloc_output_context2(&ofmt_ctx, NULL, "flv", url);
+        if (ret < 0) {
+            char a[64];
+            char* err = av_make_error_string(a, 64, ret);
+            NSLog(@"ERR::live_streaming: avformat_alloc_output_context2: %s\r\n", err);
+            return ret;
+        }
+        ret = [self initialize_outputfile:ofmt_ctx :out_stream :pFormatCtx :url :1];
+        if (ret < 0) {
+            char a[64];
+            char* err = av_make_error_string(a, 64, ret);
+            NSLog(@"Initialization failed, return %s\r\n", err);
+            //stop_live();
+            return ret;
+        }
+    }
+    
+    AVStream* in_stream = pFormatCtx->streams[packet->stream_index];
+    if (packet->stream_index >= pFormatCtx->nb_streams || !stream_mapping_live || stream_mapping_live[packet->stream_index] < 0) {
+        NSLog(@"Something wrong\r\n");
+        //stop_live();
+        return -1;
+    }
+    AVPacket* stream_pkt = av_packet_clone(packet);
+    stream_pkt->stream_index = stream_mapping_live[packet->stream_index];
+    out_stream = ofmt_ctx->streams[packet->stream_index];
+
+    if (packet->stream_index == 1) {
+        if (pts_start_live_timestamp_1 == 0 || dts_start_live_timestamp_1 == 0) {
+            // timestamp at recording starting
+            pts_start_live_timestamp_1 = packet->pts;
+            dts_start_live_timestamp_1 = packet->dts;
+        }
+        stream_pkt->pts -= pts_start_live_timestamp_1;
+        stream_pkt->dts -= dts_start_live_timestamp_1;
+        if (packet->pts == AV_NOPTS_VALUE || stream_pkt->pts < last_mux_pts_1_live || stream_pkt->dts < last_mux_dts_1_live) {
+            int64_t duration = 0;
+            if (stream_pkt->duration > 0) {
+                // use duration from packet if it provide
+                duration = stream_pkt->duration;
+            } else {
+                //, or calculate with frame rate and others
+                duration = in_stream->time_base.den / in_stream->r_frame_rate.num * in_stream->r_frame_rate.den;
+            }
+            // translate timestamp when window was dragged or resized
+            stream_pkt->pts = last_mux_pts_1_live + duration;
+            stream_pkt->dts = last_mux_dts_1_live + duration;
+        }
+        // remember timestamp after translation for the next round
+        last_mux_pts_1_live = stream_pkt->pts;
+        last_mux_dts_1_live = stream_pkt->dts;
+    } else if (packet->stream_index == 0) {
+        if (pts_start_live_timestamp_0 == 0 || dts_start_live_timestamp_0 == 0) {
+            // timestamp at recording starting
+            pts_start_live_timestamp_0 = packet->pts;
+            dts_start_live_timestamp_0 = packet->dts;
+        }
+        stream_pkt->pts -= pts_start_live_timestamp_0;
+        stream_pkt->dts -= dts_start_live_timestamp_0;
+        if (packet->pts == AV_NOPTS_VALUE || stream_pkt->pts < last_mux_pts_0_live || stream_pkt->dts < last_mux_dts_0_live) {
+            int64_t duration = 0;
+            if (stream_pkt->duration > 0) {
+                // use duration from packet if it provide
+                duration = stream_pkt->duration;
+            } else {
+                //, or calculate with frame rate and others
+                duration = in_stream->time_base.den / in_stream->r_frame_rate.num * in_stream->r_frame_rate.den;
+            }
+            // translate timestamp when window was dragged or resized
+            stream_pkt->pts = last_mux_pts_0_live + duration;
+            stream_pkt->dts = last_mux_dts_0_live + duration;
+        }
+        // remember timestamp after translation for the next round
+        last_mux_pts_0_live = stream_pkt->pts;
+        last_mux_dts_0_live = stream_pkt->dts;
+    }
+
+    stream_pkt->pts = av_rescale_q_rnd(stream_pkt->pts, in_stream->time_base, out_stream->time_base, (enum AVRounding)(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
+    stream_pkt->dts = av_rescale_q_rnd(stream_pkt->dts, in_stream->time_base, out_stream->time_base, (enum AVRounding)(AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
+    stream_pkt->duration = av_rescale_q(stream_pkt->duration, in_stream->time_base, out_stream->time_base);
+    stream_pkt->pos = -1;
+
+    if ((stream_pkt->pts >= 0 && stream_pkt->dts >= 0)) {
+        // write packet into file
+        ret = av_interleaved_write_frame(ofmt_ctx, stream_pkt);
+        if (ret < 0) {
+            //send_server_retry++;
+            char a[64];
+            char* err = av_make_error_string(a, 64, ret);
+            NSLog(@"Error muxing packet: %s\r\n", err);
+            /*if (send_server_retry > 99) {
+                stop_live();
+                //return;
+            }*/
+        }
+        else {
+            //send_server_retry = 0;
+        }
+    }
+
+    if (stream_pkt) {
+        av_packet_unref(stream_pkt);
+        av_packet_free(&stream_pkt);
+    }
+    /*
+    if (packet) {
+        av_packet_unref(packet);
+        av_packet_free(&packet);
+    }
+     */
+    isProcessing = 0;
+
+    return ret;
+}
+
 - (BOOL)stepFrame
 {
 	// AVPacket packet;
     int frameFinished=0;
 
     while (!frameFinished && av_read_frame(pFormatCtx, &packet) >=0 ) {
+        [self pushPacket:&packet];
+        
         // Is this a packet from the video stream?
         if(packet.stream_index==videoStream) {
             // Decode video frame

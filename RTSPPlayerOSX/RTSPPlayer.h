@@ -3,6 +3,7 @@
 #import "libavcodec/avcodec.h"
 #import "libavformat/avio.h"
 #import "libswscale/swscale.h"
+#import "libavutil/mathematics.h"
 #import <AudioToolbox/AudioQueue.h>
 #import <AudioToolbox/AudioToolbox.h>
 
@@ -31,7 +32,14 @@
     AVPacket *_packet, _currentPacket;
     BOOL primed;
    
-
+    AVFormatContext *ofmt_ctx;
+    AVStream* out_stream;
+    int isProcessing;
+    int *stream_mapping, *stream_mapping_live;
+    int64_t pts_start_live_timestamp_0, dts_start_live_timestamp_0;
+    int64_t pts_start_live_timestamp_1, dts_start_live_timestamp_1;
+    int64_t last_mux_pts_0_live, last_mux_dts_0_live;
+    int64_t last_mux_pts_1_live, last_mux_dts_1_live;
 }
 
 /* Last decoded picture as UIImage */
