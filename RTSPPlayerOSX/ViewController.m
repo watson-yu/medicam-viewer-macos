@@ -24,25 +24,49 @@
 
 @implementation ViewController
 
-- (void)startTimers
+- (void)startPreviewTimer
 {
+    if (self.nextFrameTimer) {
+        [self.nextFrameTimer invalidate];
+    }
     self.nextFrameTimer = [NSTimer scheduledTimerWithTimeInterval:1.0/30
                                                            target:self
                                                          selector:@selector(displayNextFrame:)
                                                          userInfo:nil
                                                           repeats:YES];
+    isRunningPreview = YES;
+}
 
+- (void)startPushTimer
+{
+    if (self.pushFrameTimer) {
+        [self.pushFrameTimer invalidate];
+    }
     self.pushFrameTimer = [NSTimer scheduledTimerWithTimeInterval:1.0/30
                                                            target:self
                                                          selector:@selector(pushFrame:)
                                                          userInfo:nil
                                                           repeats:YES];
+    isPushing = YES;
 }
 
-- (void)stopTimers
+- (void)stopPushTimer
 {
-    [self.nextFrameTimer invalidate];
-    [self.pushFrameTimer invalidate];
+    if (self.pushFrameTimer) {
+        [self.pushFrameTimer invalidate];
+    }
+    isPushing = NO;
+}
+
+- (void)stopPreviewTimer
+{
+    if (isPushing) {
+        [self stopPushTimer];
+    }
+    if (self.nextFrameTimer) {
+        [self.nextFrameTimer invalidate];
+    }
+    isRunningPreview = NO;
 }
 
 - (NSString*)getCameraIpAddress
@@ -60,7 +84,7 @@
     
     NSString *rtmpPushUrl = [prefs stringForKey:KEY_RTMP_URL];
     if (!rtmpPushUrl || [rtmpPushUrl length] < 14) {
-        rtmpPushUrl = @"rtpm://live.fasmedo.com/app/shuttle";
+        rtmpPushUrl = @"rtmp://live.fasmedo.com/app/shuttle";
         //@"rtmp://23841437.fme.ustream.tv/ustreamVideo/23841437/MY37x2pST4cLTQUhtB46bhHKwJjBv5zw";
         toSave = YES;
         [prefs setObject:rtmpPushUrl forKey:KEY_RTMP_URL];
@@ -72,11 +96,8 @@
     return cameraIpAddress;
 }
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
-    NSString *cameraIpAddress = [self getCameraIpAddress];
-
+- (void)connectCamera:(NSString *)cameraIpAddress
+{
     NSString *rtspUrl = [NSString stringWithFormat:@"rtsp://%@/h264?w=1280&h=720&fps=30", cameraIpAddress];
     
     self.lastFrameTime = -1;
@@ -85,7 +106,20 @@
     self.video.outputHeight = 720;
     [self.video seekTime:0.0];
 
-    [self startTimers];
+    [self startPreviewTimer];
+    //[self startPushTimer];
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    isRunningPreview = NO;
+    isPushing = NO;
+    
+    NSString *cameraIpAddress = [self getCameraIpAddress];
+    if (cameraIpAddress && [cameraIpAddress length] > 7) {
+        socketConnected = NO;
+        [self checkSocket:cameraIpAddress];
+    }
 }
 
 -(void)displayNextFrame:(NSTimer *)timer
@@ -115,14 +149,58 @@
     [super setRepresentedObject:representedObject];
 }
 
+- (void)checkSocket:(NSString*)ipAddress
+{
+    NSError *error;
+    GCDAsyncSocket *asyncSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    socketConnected = NO;
+    [asyncSocket connectToHost:ipAddress onPort:PTP_PORT withTimeout:6.8 error:&error];
+}
+
+- (void)socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(UInt16)port
+{
+    NSLog(@"Connected");
+    socketConnected = YES;
+    [self connectCamera:host];
+}
+
+- (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(nullable NSError *)err
+{
+    if (socketConnected) {
+        // Disconnect after checked successfully, normal case
+    } else {
+        // handle error
+        NSLog(@"Disonnected");
+        [self performSegueWithIdentifier:@"ConnectionSettingsSegue" sender:self];
+
+    }
+}
+
+
 - (IBAction)startPreview:(id)sender
 {
-    [self startTimers];
+    [self startPreviewTimer];
 }
 
 - (IBAction)stopPreview:(id)sender
 {
-    [self stopTimers];
+    if (isPushing) {
+        [self stopPushTimer];
+    }
+    [self stopPreviewTimer];
+}
+
+- (IBAction)startPushing:(id)sender
+{
+    if (! isRunningPreview) {
+        [self startPreviewTimer];
+    }
+    [self startPushTimer];
+}
+
+- (IBAction)stopPushing:(id)sender
+{
+    [self stopPushTimer];
 }
 
 @end

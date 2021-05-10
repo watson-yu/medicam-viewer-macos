@@ -397,7 +397,7 @@ initError:
     }
     if (packet) {
         av_packet_unref(packet);
-        av_packet_free(&packet);
+        //av_packet_free(&packet);
     }
 
     return ret;

@@ -25,11 +25,17 @@
 		806B28D41C5FE7A40089BBB2 /* AudioStreamer.m in Sources */ = {isa = PBXBuildFile; fileRef = 806B28CF1C5FE7A40089BBB2 /* AudioStreamer.m */; };
 		806B28D51C5FE7A40089BBB2 /* RTSPPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 806B28D11C5FE7A40089BBB2 /* RTSPPlayer.m */; };
 		806B28D61C5FE7A40089BBB2 /* Utilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 806B28D31C5FE7A40089BBB2 /* Utilities.m */; };
+		A0A499BF129C943A6574630F /* Pods_MediCamViewer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 296F907D6CF3DEA0FCFB46B6 /* Pods_MediCamViewer.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1B18DF0784234436970ED66B /* Pods-MediCamViewer.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MediCamViewer.debug.xcconfig"; path = "Target Support Files/Pods-MediCamViewer/Pods-MediCamViewer.debug.xcconfig"; sourceTree = "<group>"; };
+		296F907D6CF3DEA0FCFB46B6 /* Pods_MediCamViewer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MediCamViewer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		42967629D2ED5F6EC5373F03 /* Pods-MediCamViewer.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MediCamViewer.release.xcconfig"; path = "Target Support Files/Pods-MediCamViewer/Pods-MediCamViewer.release.xcconfig"; sourceTree = "<group>"; };
+		4543E75E2648F2CD000FE735 /* MediCamViewer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MediCamViewer.entitlements; sourceTree = "<group>"; };
 		4594E984264525CC0088E197 /* ConnSettingsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConnSettingsViewController.m; sourceTree = "<group>"; };
 		4594E987264525E70088E197 /* ConnSettingsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConnSettingsViewController.h; sourceTree = "<group>"; };
+		4594E98F2648DDEE0088E197 /* CocoaAsyncSocket.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CocoaAsyncSocket.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		806B28A31C5FE4380089BBB2 /* MediCamViewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MediCamViewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		806B28A61C5FE4380089BBB2 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		806B28A71C5FE4380089BBB2 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -70,17 +76,30 @@
 				806B28C61C5FE6C30089BBB2 /* libavfilter.dylib in Frameworks */,
 				806B28C81C5FE6C30089BBB2 /* libavresample.dylib in Frameworks */,
 				806B28CB1C5FE6C30089BBB2 /* libswresample.dylib in Frameworks */,
+				A0A499BF129C943A6574630F /* Pods_MediCamViewer.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		65C414103E6FDDA1C532A05A /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				1B18DF0784234436970ED66B /* Pods-MediCamViewer.debug.xcconfig */,
+				42967629D2ED5F6EC5373F03 /* Pods-MediCamViewer.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		806B289A1C5FE4380089BBB2 = {
 			isa = PBXGroup;
 			children = (
+				4543E75E2648F2CD000FE735 /* MediCamViewer.entitlements */,
 				806B28A51C5FE4380089BBB2 /* RTSPPlayerOSX */,
 				806B28A41C5FE4380089BBB2 /* Products */,
+				65C414103E6FDDA1C532A05A /* Pods */,
+				F406FC254D1E71305E5D1262 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -148,6 +167,15 @@
 			name = FFMpegDecoder;
 			sourceTree = "<group>";
 		};
+		F406FC254D1E71305E5D1262 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4594E98F2648DDEE0088E197 /* CocoaAsyncSocket.framework */,
+				296F907D6CF3DEA0FCFB46B6 /* Pods_MediCamViewer.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -155,9 +183,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 806B28B71C5FE4380089BBB2 /* Build configuration list for PBXNativeTarget "MediCamViewer" */;
 			buildPhases = (
+				BF0A1BF771EF3522991CEABE /* [CP] Check Pods Manifest.lock */,
 				806B289F1C5FE4380089BBB2 /* Sources */,
 				806B28A01C5FE4380089BBB2 /* Frameworks */,
 				806B28A11C5FE4380089BBB2 /* Resources */,
+				EA860153F291CD2505229E9E /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -179,6 +209,8 @@
 				TargetAttributes = {
 					806B28A21C5FE4380089BBB2 = {
 						CreatedOnToolsVersion = 7.2;
+						DevelopmentTeam = 3M2JNWAW6T;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -212,6 +244,49 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		BF0A1BF771EF3522991CEABE /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-MediCamViewer-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		EA860153F291CD2505229E9E /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-MediCamViewer/Pods-MediCamViewer-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/CocoaAsyncSocket/CocoaAsyncSocket.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CocoaAsyncSocket.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MediCamViewer/Pods-MediCamViewer-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		806B289F1C5FE4380089BBB2 /* Sources */ = {
@@ -317,18 +392,31 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
 			name = Release;
 		};
 		806B28B81C5FE4380089BBB2 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1B18DF0784234436970ED66B /* Pods-MediCamViewer.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MediCamViewer.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/ffmpeg/4.4_1/lib";
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/ffmpeg/4.4_1/include";
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = 3M2JNWAW6T;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/ffmpeg/4.4_1/lib",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/ffmpeg/4.4_1/include",
+				);
 				INFOPLIST_FILE = RTSPPlayerOSX/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
@@ -336,19 +424,33 @@
 					"$(PROJECT_DIR)/RTSPPlayerOSX",
 					"$(PROJECT_DIR)/ffmpeg/4.4_1/lib",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.omarzl.RTSPPlayerOSX;
+				MARKETING_VERSION = 1.0.3;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.faspro.app.viewer-macos";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Debug;
 		};
 		806B28B91C5FE4380089BBB2 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 42967629D2ED5F6EC5373F03 /* Pods-MediCamViewer.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MediCamViewer.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/ffmpeg/4.4_1/lib";
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/ffmpeg/4.4_1/include";
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = 3M2JNWAW6T;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/ffmpeg/4.4_1/lib",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/ffmpeg/4.4_1/include",
+				);
 				INFOPLIST_FILE = RTSPPlayerOSX/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
@@ -356,8 +458,10 @@
 					"$(PROJECT_DIR)/RTSPPlayerOSX",
 					"$(PROJECT_DIR)/ffmpeg/4.4_1/lib",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.omarzl.RTSPPlayerOSX;
+				MARKETING_VERSION = 1.0.3;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.faspro.app.viewer-macos";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Release;
 		};
